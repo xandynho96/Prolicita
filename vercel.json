@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/buscar-licitacoes",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 11 * * *"
     }
   ]
 }
