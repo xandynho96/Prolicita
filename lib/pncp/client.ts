@@ -27,8 +27,8 @@ async function fetchJson<T>(url: string, tentativa = 0): Promise<T | null> {
   // PNCP responde 204 (sem corpo) quando não há resultados para a consulta
   if (res.status === 204) return null;
 
-  if (res.status === 429 && tentativa < 3) {
-    await sleep(1000 * 2 ** tentativa);
+  if (res.status === 429 && tentativa < 5) {
+    await sleep(1500 * 2 ** tentativa);
     return fetchJson<T>(url, tentativa + 1);
   }
 
@@ -76,7 +76,7 @@ async function buscarPorModalidade(
 
     if (pagina >= data.totalPaginas) break;
     pagina += 1;
-    await sleep(300);
+    await sleep(600);
   }
 
   return resultados;
