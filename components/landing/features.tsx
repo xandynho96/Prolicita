@@ -8,6 +8,7 @@ import {
   Bell,
   MapPinned,
 } from "lucide-react";
+import { ScrollReveal } from "./scroll-reveal";
 
 const RECURSOS = [
   {
@@ -62,9 +63,9 @@ const RECURSOS = [
 
 export function Features() {
   return (
-    <section className="bg-white py-16">
+    <section id="recursos" className="bg-white py-16">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
+        <ScrollReveal className="mx-auto max-w-2xl text-center">
           <h2 className="text-[27px] font-extrabold tracking-tight">
             Tudo o que você precisa num só lugar
           </h2>
@@ -72,19 +73,21 @@ export function Features() {
             Da busca à proposta, sem planilha solta nem aba do PNCP aberta o
             dia inteiro.
           </p>
-        </div>
+        </ScrollReveal>
 
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {RECURSOS.map((recurso) => (
-            <div key={recurso.titulo} className="flex flex-col gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#F3F6FE] text-primary">
-                <recurso.icon className="h-5 w-5" />
+          {RECURSOS.map((recurso, i) => (
+            <ScrollReveal key={recurso.titulo} delayMs={(i % 4) * 80}>
+              <div className="flex flex-col gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#2F5FDE] to-[#7C5CFC] text-white">
+                  <recurso.icon className="h-5 w-5" />
+                </div>
+                <div className="text-[14px] font-bold">{recurso.titulo}</div>
+                <p className="text-[13px] leading-relaxed text-muted-foreground">
+                  {recurso.descricao}
+                </p>
               </div>
-              <div className="text-[14px] font-bold">{recurso.titulo}</div>
-              <p className="text-[13px] leading-relaxed text-muted-foreground">
-                {recurso.descricao}
-              </p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>

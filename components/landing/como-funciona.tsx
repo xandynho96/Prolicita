@@ -1,4 +1,5 @@
 import { ClipboardList, Radar, Kanban, FileText } from "lucide-react";
+import { ScrollReveal } from "./scroll-reveal";
 
 const PASSOS = [
   {
@@ -29,8 +30,8 @@ const PASSOS = [
 
 export function ComoFunciona() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16">
-      <div className="mx-auto max-w-2xl text-center">
+    <section id="como-funciona" className="mx-auto max-w-6xl px-6 py-16">
+      <ScrollReveal className="mx-auto max-w-2xl text-center">
         <h2 className="text-[27px] font-extrabold tracking-tight">
           Como funciona
         </h2>
@@ -38,22 +39,21 @@ export function ComoFunciona() {
           Do cadastro à proposta pronta, sem precisar acompanhar o PNCP na
           mão.
         </p>
-      </div>
+      </ScrollReveal>
 
       <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {PASSOS.map((passo) => (
-          <div
-            key={passo.titulo}
-            className="flex flex-col gap-3 rounded-[14px] border border-border bg-white p-5 shadow-sm"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#F3F6FE] text-primary">
-              <passo.icon className="h-5 w-5" />
+        {PASSOS.map((passo, i) => (
+          <ScrollReveal key={passo.titulo} delayMs={i * 100}>
+            <div className="flex h-full flex-col gap-3 rounded-[14px] border border-border bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#2F5FDE] to-[#7C5CFC] text-white">
+                <passo.icon className="h-5 w-5" />
+              </div>
+              <div className="text-[14.5px] font-bold">{passo.titulo}</div>
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                {passo.descricao}
+              </p>
             </div>
-            <div className="text-[14.5px] font-bold">{passo.titulo}</div>
-            <p className="text-[13px] leading-relaxed text-muted-foreground">
-              {passo.descricao}
-            </p>
-          </div>
+          </ScrollReveal>
         ))}
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { BrowserFrame } from "./browser-frame";
+import { ScrollReveal } from "./scroll-reveal";
 
 const BLOCOS = [
   {
@@ -29,7 +30,7 @@ export function ScreenshotShowcase() {
     <section className="mx-auto max-w-6xl px-6 py-16">
       <div className="flex flex-col gap-16">
         {BLOCOS.map((bloco, i) => (
-          <div
+          <ScrollReveal
             key={bloco.titulo}
             className={`flex flex-col items-center gap-10 lg:flex-row ${
               i % 2 === 1 ? "lg:flex-row-reverse" : ""
@@ -51,7 +52,7 @@ export function ScreenshotShowcase() {
                 {bloco.descricao}
               </p>
             </div>
-          </div>
+          </ScrollReveal>
         ))}
       </div>
     </section>
