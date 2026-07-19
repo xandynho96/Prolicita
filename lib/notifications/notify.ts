@@ -1,6 +1,36 @@
+import { and, desc, eq, gte } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { empresas, licitacoes, notificacoes } from "@/lib/db/schema";
 import { enviarWhatsapp } from "./whatsapp";
+
+/**
+ * Intervalo mínimo entre resumos de WhatsApp para a mesma empresa, mesmo
+ * que o cron e uma busca manual rodem próximos um do outro. Reduz a
+ * frequência de envios automatizados — um dos fatores que o WhatsApp usa
+ * para sinalizar contas Business como comportamento de bot.
+ */
+const INTERVALO_MINIMO_HORAS = 3;
+
+async function envioRecenteDemais(empresaId: string): Promise<boolean> {
+  const desde = new Date();
+  desde.setHours(desde.getHours() - INTERVALO_MINIMO_HORAS);
+
+  const [ultimo] = await db
+    .select({ enviadoEm: notificacoes.enviadoEm })
+    .from(notificacoes)
+    .where(
+      and(
+        eq(notificacoes.empresaId, empresaId),
+        eq(notificacoes.canal, "whatsapp"),
+        eq(notificacoes.status, "enviado"),
+        gte(notificacoes.enviadoEm, desde)
+      )
+    )
+    .orderBy(desc(notificacoes.enviadoEm))
+    .limit(1);
+
+  return !!ultimo;
+}
 
 function formatarValor(valor: string | null): string {
   if (!valor) return "não informado";
@@ -101,13 +131,17 @@ function delayHumano(): Promise<void> {
  * Envia UM resumo por contato de WhatsApp da empresa, agrupando todos os
  * matches relevantes encontrados numa mesma execução de busca/matching.
  * Evita o padrão de rajada (várias mensagens quase idênticas em segundos)
- * que faz o WhatsApp restringir números de contas Business.
+ * que faz o WhatsApp restringir números de contas Business. Respeita o
+ * toggle `whatsappAtivo` (pausa manual pelo usuário) e um intervalo
+ * mínimo entre envios, mesmo que cron e busca manual coincidam.
  */
 export async function enviarResumoWhatsapp(
   empresa: typeof empresas.$inferSelect,
   itens: { licitacao: typeof licitacoes.$inferSelect; motivo: string }[]
 ): Promise<void> {
   if (itens.length === 0 || empresa.contatosWhatsapp.length === 0) return;
+  if (!empresa.whatsappAtivo) return;
+  if (await envioRecenteDemais(empresa.id)) return;
 
   const mensagem = montarResumo(empresa, itens);
 

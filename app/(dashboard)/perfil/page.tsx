@@ -65,6 +65,7 @@ interface EmpresaForm {
   buscarBrasilTodo: boolean;
   modalidades: number[];
   contatosWhatsapp: Contato[];
+  whatsappAtivo: boolean;
   representanteLegalNome: string;
   representanteLegalCpf: string;
   representanteLegalCargo: string;
@@ -94,6 +95,7 @@ const vazio: EmpresaForm = {
   buscarBrasilTodo: false,
   modalidades: [],
   contatosWhatsapp: [],
+  whatsappAtivo: true,
   representanteLegalNome: "",
   representanteLegalCpf: "",
   representanteLegalCargo: "",
@@ -144,6 +146,7 @@ export default function PerfilPage() {
             contatosWhatsapp: (e.contatosWhatsapp ?? []).map(
               (c: Contato) => ({ ...c, numero: maskWhatsapp(c.numero) })
             ),
+            whatsappAtivo: e.whatsappAtivo ?? true,
             representanteLegalNome: e.representanteLegalNome ?? "",
             representanteLegalCpf: maskCpf(e.representanteLegalCpf ?? ""),
             representanteLegalCargo: e.representanteLegalCargo ?? "",
@@ -290,6 +293,7 @@ export default function PerfilPage() {
       buscarBrasilTodo: form.buscarBrasilTodo,
       modalidades: form.modalidades,
       contatosWhatsapp: contatosValidos,
+      whatsappAtivo: form.whatsappAtivo,
       representanteLegalNome: form.representanteLegalNome || undefined,
       representanteLegalCpf: form.representanteLegalCpf || undefined,
       representanteLegalCargo: form.representanteLegalCargo || undefined,
@@ -686,6 +690,27 @@ export default function PerfilPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
+            <div className="flex items-start gap-2 rounded-lg border border-border bg-accent/30 p-3">
+              <Checkbox
+                id="whatsappAtivo"
+                checked={form.whatsappAtivo}
+                onCheckedChange={(v) =>
+                  setForm((f) => ({ ...f, whatsappAtivo: v === true }))
+                }
+              />
+              <div>
+                <Label htmlFor="whatsappAtivo" className="font-normal">
+                  Enviar alertas por WhatsApp
+                </Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Desative para pausar os envios a qualquer momento — o
+                  painel continua mostrando as licitações compatíveis
+                  normalmente. Útil se o número estiver sob restrição do
+                  WhatsApp.
+                </p>
+              </div>
+            </div>
+
             {form.contatosWhatsapp.map((contato, index) => (
               <div key={index} className="flex items-end gap-2">
                 <div className="flex-1 space-y-2">

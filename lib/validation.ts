@@ -70,6 +70,7 @@ export const empresaSchema = z.object({
   buscarBrasilTodo: z.boolean().default(false),
   modalidades: z.array(z.number()).max(LIMITES.ARRAY_PEQUENO),
   contatosWhatsapp: z.array(contatoWhatsappSchema).max(20),
+  whatsappAtivo: z.boolean().default(true),
   representanteLegalNome: textoOpcional(LIMITES.TEXTO_CURTO),
   representanteLegalCpf: z
     .string()

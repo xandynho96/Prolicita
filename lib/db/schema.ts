@@ -116,6 +116,7 @@ export const empresas = pgTable("empresas", {
     .$type<{ nome: string; numero: string }[]>()
     .notNull()
     .default([]),
+  whatsappAtivo: boolean("whatsapp_ativo").notNull().default(true),
   representanteLegalNome: text("representante_legal_nome"),
   representanteLegalCpf: text("representante_legal_cpf"),
   representanteLegalCargo: text("representante_legal_cargo"),
