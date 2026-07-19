@@ -16,7 +16,13 @@ interface GerarPropostaInput {
     razaoSocial: string;
     descricaoPerfil: string | null;
   };
-  produtos: { id: string; nome: string; descricaoResumida: string; descricaoDetalhada: string | null }[];
+  produtos: {
+    id: string;
+    nome: string;
+    tipo: "produto" | "servico";
+    descricaoResumida: string;
+    descricaoDetalhada: string | null;
+  }[];
   licitacao: {
     objeto: string;
     orgaoNome: string;
@@ -70,7 +76,7 @@ export async function gerarProposta(
     .slice(0, 20)
     .map(
       (p) =>
-        `- id="${p.id}" | ${p.nome.slice(0, 200)}: ${p.descricaoResumida.slice(0, 500)}${
+        `- id="${p.id}" | tipo=${p.tipo} | ${p.nome.slice(0, 200)}: ${p.descricaoResumida.slice(0, 500)}${
           p.descricaoDetalhada ? ` | Detalhes: ${p.descricaoDetalhada.slice(0, 800)}` : ""
         }`
     )
@@ -93,14 +99,19 @@ Redija um RASCUNHO de proposta técnica/comercial para essa licitação
 pública brasileira, seguindo os elementos formais mais comuns sob a Lei
 14.133/21 (o edital específico pode exigir formato adicional — isto é só
 um ponto de partida a ser revisado). Selecione, dentre o catálogo, os
-produtos que efetivamente respondem ao objeto (pelo "id"). Responda
-SOMENTE em JSON no formato:
+produtos que efetivamente respondem ao objeto (pelo "id"). Adapte o
+vocabulário conforme o "tipo" dos itens selecionados: para itens
+tipo="produto", fale em entrega, garantia, especificações técnicas do
+bem e prazo de entrega; para itens tipo="servico", fale em execução,
+cronograma de implantação/prestação, equipe técnica e suporte. Se a
+seleção misturar produtos e serviços, trate cada um com o vocabulário
+apropriado dentro do mesmo texto. Responda SOMENTE em JSON no formato:
 {
   "produtosSelecionadosIds": ["id1", "id2"],
   "apresentacaoEmpresa": "parágrafo de apresentação institucional da empresa, em português",
   "objetoOfertado": "descrição do objeto ofertado, alinhado ao objeto do edital",
   "especificacaoTecnica": "especificação técnica da solução ofertada, citando os produtos selecionados e suas funcionalidades relevantes ao objeto",
-  "cronogramaImplantacao": "cronograma sugerido de implantação em etapas (texto, não tabela)",
+  "cronogramaImplantacao": "cronograma sugerido em etapas — de implantação/execução para serviços, ou de entrega para produtos (texto, não tabela)",
   "detalhamentoValor": "texto explicando o que compõe o valor (licenciamento, implantação, treinamento, suporte) sem inventar um valor numérico específico",
   "prazoExecucaoDias": number (prazo de execução/implantação sugerido em dias, estimativa razoável para o escopo),
   "declaracoes": "texto com as declarações padrão do licitante (pleno conhecimento do edital, preços incluem todos os custos, etc.)"

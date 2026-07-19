@@ -4,7 +4,7 @@ type Empresa = typeof empresas.$inferSelect;
 type Licitacao = typeof licitacoes.$inferSelect;
 type Produto = typeof produtosServicos.$inferSelect;
 
-function normalizar(texto: string): string {
+export function normalizar(texto: string): string {
   return texto
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
@@ -31,7 +31,7 @@ const STOPWORDS = new Set([
   "produtos",
 ]);
 
-function extrairTermos(descricao: string): string[] {
+export function extrairTermos(descricao: string): string[] {
   return normalizar(descricao)
     .split(/[^a-z0-9]+/)
     .filter((t) => t.length > 3 && !STOPWORDS.has(t));
@@ -92,4 +92,25 @@ export function passaFiltroPreliminar(
 
   const objeto = normalizar(licitacao.objeto);
   return [...termos].some((termo) => termo.length > 2 && objeto.includes(termo));
+}
+
+/**
+ * Entre o catálogo de produtos/serviços da empresa, quais aparentam
+ * responder ao objeto de uma licitação — usado só para exibir badges
+ * (heurística de sobreposição de termos), não para decidir relevância.
+ */
+export function produtosRelacionados(
+  objeto: string,
+  produtos: Produto[]
+): Produto[] {
+  const objetoNormalizado = normalizar(objeto);
+  return produtos.filter((produto) => {
+    const termos = [
+      ...extrairTermos(produto.nome),
+      ...extrairTermos(produto.descricaoResumida),
+    ];
+    return termos.some(
+      (termo) => termo.length > 3 && objetoNormalizado.includes(termo)
+    );
+  });
 }

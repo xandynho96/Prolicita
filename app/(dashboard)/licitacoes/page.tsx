@@ -2,12 +2,13 @@ import Link from "next/link";
 import { and, desc, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { empresaLicitacaoMatches, licitacoes } from "@/lib/db/schema";
+import { empresaLicitacaoMatches, licitacoes, produtosServicos } from "@/lib/db/schema";
 import { getEmpresaDoUsuario } from "@/lib/empresa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BuscarAgoraButton } from "@/components/dashboard/buscar-button";
 import { LicitacoesClient } from "@/components/licitacoes/licitacoes-client";
+import { produtosRelacionados } from "@/lib/matching/keyword-filter";
 
 export default async function LicitacoesPage() {
   const session = await auth();
@@ -28,20 +29,33 @@ export default async function LicitacoesPage() {
     );
   }
 
-  const resultados = await db
-    .select({ match: empresaLicitacaoMatches, licitacao: licitacoes })
-    .from(empresaLicitacaoMatches)
-    .innerJoin(
-      licitacoes,
-      eq(licitacoes.id, empresaLicitacaoMatches.licitacaoId)
-    )
-    .where(
-      and(
-        eq(empresaLicitacaoMatches.empresaId, empresa.id),
-        eq(empresaLicitacaoMatches.status, "relevante")
+  const [resultadosBase, produtos] = await Promise.all([
+    db
+      .select({ match: empresaLicitacaoMatches, licitacao: licitacoes })
+      .from(empresaLicitacaoMatches)
+      .innerJoin(
+        licitacoes,
+        eq(licitacoes.id, empresaLicitacaoMatches.licitacaoId)
       )
-    )
-    .orderBy(desc(empresaLicitacaoMatches.createdAt));
+      .where(
+        and(
+          eq(empresaLicitacaoMatches.empresaId, empresa.id),
+          eq(empresaLicitacaoMatches.status, "relevante")
+        )
+      )
+      .orderBy(desc(empresaLicitacaoMatches.createdAt)),
+    db
+      .select()
+      .from(produtosServicos)
+      .where(eq(produtosServicos.empresaId, empresa.id)),
+  ]);
+
+  const resultados = resultadosBase.map((r) => ({
+    ...r,
+    produtosRelacionados: produtosRelacionados(r.licitacao.objeto, produtos).map(
+      (p) => p.nome
+    ),
+  }));
 
   return (
     <div className="flex flex-col gap-5">

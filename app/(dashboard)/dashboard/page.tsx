@@ -1,9 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { documentos, empresaLicitacaoMatches, licitacoes } from "@/lib/db/schema";
+import {
+  documentos,
+  empresaLicitacaoMatches,
+  licitacoes,
+  oportunidades,
+  propostas,
+} from "@/lib/db/schema";
 import { getEmpresaDoUsuario } from "@/lib/empresa";
 import {
   Card,
@@ -16,6 +22,12 @@ import { Button } from "@/components/ui/button";
 import { BuscarAgoraButton } from "@/components/dashboard/buscar-button";
 import { formatarValor } from "@/lib/format";
 import { scoreMeta } from "@/lib/matching/score-meta";
+import { ETAPAS, ETAPA_META } from "@/lib/oportunidades/meta";
+import {
+  LicitacoesPorDiaChart,
+  ModalidadesChart,
+  PipelinePorEtapaChart,
+} from "@/components/dashboard/charts";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -48,44 +60,129 @@ export default async function DashboardPage() {
     );
   }
 
-  const [[{ count: totalRelevantes }], docsAtencaoRows, recentes] =
-    await Promise.all([
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(empresaLicitacaoMatches)
-        .where(
-          and(
-            eq(empresaLicitacaoMatches.empresaId, empresa.id),
-            eq(empresaLicitacaoMatches.status, "relevante")
-          )
-        ),
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(documentos)
-        .where(
-          and(
-            eq(documentos.empresaId, empresa.id),
-            inArray(documentos.status, ["vencido", "vencendo"])
-          )
-        ),
-      db
-        .select({ match: empresaLicitacaoMatches, licitacao: licitacoes })
-        .from(empresaLicitacaoMatches)
-        .innerJoin(
-          licitacoes,
-          eq(licitacoes.id, empresaLicitacaoMatches.licitacaoId)
+  const catorzeDiasAtras = new Date();
+  catorzeDiasAtras.setDate(catorzeDiasAtras.getDate() - 13);
+  catorzeDiasAtras.setHours(0, 0, 0, 0);
+
+  const [
+    [{ count: totalRelevantes }],
+    docsAtencaoRows,
+    recentes,
+    matchesRecentes,
+    etapaRows,
+    modalidadeRows,
+    [{ count: totalPropostas }],
+    [{ count: totalGanhas }],
+  ] = await Promise.all([
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(empresaLicitacaoMatches)
+      .where(
+        and(
+          eq(empresaLicitacaoMatches.empresaId, empresa.id),
+          eq(empresaLicitacaoMatches.status, "relevante")
         )
-        .where(
-          and(
-            eq(empresaLicitacaoMatches.empresaId, empresa.id),
-            eq(empresaLicitacaoMatches.status, "relevante")
-          )
+      ),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(documentos)
+      .where(
+        and(
+          eq(documentos.empresaId, empresa.id),
+          inArray(documentos.status, ["vencido", "vencendo"])
         )
-        .orderBy(desc(empresaLicitacaoMatches.createdAt))
-        .limit(5),
-    ]);
+      ),
+    db
+      .select({ match: empresaLicitacaoMatches, licitacao: licitacoes })
+      .from(empresaLicitacaoMatches)
+      .innerJoin(
+        licitacoes,
+        eq(licitacoes.id, empresaLicitacaoMatches.licitacaoId)
+      )
+      .where(
+        and(
+          eq(empresaLicitacaoMatches.empresaId, empresa.id),
+          eq(empresaLicitacaoMatches.status, "relevante")
+        )
+      )
+      .orderBy(desc(empresaLicitacaoMatches.createdAt))
+      .limit(5),
+    db
+      .select({ createdAt: empresaLicitacaoMatches.createdAt })
+      .from(empresaLicitacaoMatches)
+      .where(
+        and(
+          eq(empresaLicitacaoMatches.empresaId, empresa.id),
+          eq(empresaLicitacaoMatches.status, "relevante"),
+          gte(empresaLicitacaoMatches.createdAt, catorzeDiasAtras)
+        )
+      ),
+    db
+      .select({ etapa: oportunidades.etapa, count: sql<number>`count(*)::int` })
+      .from(oportunidades)
+      .where(eq(oportunidades.empresaId, empresa.id))
+      .groupBy(oportunidades.etapa),
+    db
+      .select({
+        modalidade: licitacoes.modalidade,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(empresaLicitacaoMatches)
+      .innerJoin(
+        licitacoes,
+        eq(licitacoes.id, empresaLicitacaoMatches.licitacaoId)
+      )
+      .where(
+        and(
+          eq(empresaLicitacaoMatches.empresaId, empresa.id),
+          eq(empresaLicitacaoMatches.status, "relevante")
+        )
+      )
+      .groupBy(licitacoes.modalidade)
+      .orderBy(desc(sql`count(*)`))
+      .limit(6),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(propostas)
+      .where(eq(propostas.empresaId, empresa.id)),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(oportunidades)
+      .where(
+        and(eq(oportunidades.empresaId, empresa.id), eq(oportunidades.etapa, "ganha"))
+      ),
+  ]);
 
   const docsAtencao = docsAtencaoRows[0]?.count ?? 0;
+
+  const porDia = Array.from({ length: 14 }, (_, i) => {
+    const dia = new Date(catorzeDiasAtras);
+    dia.setDate(dia.getDate() + i);
+    const chave = dia.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+    });
+    return { chave, dia: chave, total: 0 };
+  });
+  for (const { createdAt } of matchesRecentes) {
+    const chave = new Date(createdAt).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+    });
+    const bucket = porDia.find((d) => d.chave === chave);
+    if (bucket) bucket.total += 1;
+  }
+
+  const etapaContagem = new Map(etapaRows.map((r) => [r.etapa, r.count]));
+  const pipelinePorEtapa = ETAPAS.filter((e) => e !== "ignorada").map((etapa) => ({
+    etapa: ETAPA_META[etapa].label,
+    total: etapaContagem.get(etapa) ?? 0,
+    color: ETAPA_META[etapa].color,
+  }));
+
+  const modalidades = modalidadeRows
+    .filter((r) => r.modalidade)
+    .map((r) => ({ modalidade: r.modalidade as string, total: r.count }));
 
   return (
     <div className="flex flex-col gap-5">
@@ -141,6 +238,46 @@ export default async function DashboardPage() {
             </p>
           </CardHeader>
         </Card>
+        <Card className="gap-1.5 py-5">
+          <CardHeader className="px-5">
+            <CardDescription className="text-xs font-bold uppercase tracking-wide">
+              Propostas geradas
+            </CardDescription>
+            <CardTitle className="text-3xl">{totalPropostas}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card className="gap-1.5 py-5">
+          <CardHeader className="px-5">
+            <CardDescription className="text-xs font-bold uppercase tracking-wide">
+              Licitações ganhas
+            </CardDescription>
+            <CardTitle className="text-3xl text-[#12896B]">
+              {totalGanhas}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        <Card className="gap-1.5 py-5">
+          <CardHeader className="px-5">
+            <CardDescription className="text-xs font-bold uppercase tracking-wide">
+              No pipeline
+            </CardDescription>
+            <CardTitle className="text-3xl">
+              {ETAPAS.filter((e) => e !== "ignorada" && e !== "ganha" && e !== "perdida").reduce(
+                (soma, etapa) => soma + (etapaContagem.get(etapa) ?? 0),
+                0
+              )}
+            </CardTitle>
+            <p className="text-[12.5px] text-muted-foreground">
+              Oportunidades em andamento
+            </p>
+          </CardHeader>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <LicitacoesPorDiaChart dados={porDia} />
+        <PipelinePorEtapaChart dados={pipelinePorEtapa} />
+        <ModalidadesChart dados={modalidades} />
       </div>
 
       <div>

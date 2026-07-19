@@ -69,6 +69,8 @@ export const propostaStatusEnum = pgEnum("proposta_status", [
   "finalizada",
 ]);
 
+export const produtoTipoEnum = pgEnum("produto_tipo", ["produto", "servico"]);
+
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
@@ -128,9 +130,28 @@ export const produtosServicos = pgTable("produtos_servicos", {
     .notNull()
     .references(() => empresas.id, { onDelete: "cascade" }),
   nome: text("nome").notNull(),
+  tipo: produtoTipoEnum("tipo").notNull().default("servico"),
   descricaoResumida: text("descricao_resumida").notNull(),
   descricaoDetalhada: text("descricao_detalhada"),
   createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const capagMunicipios = pgTable("capag_municipios", {
+  codigoIbge: text("codigo_ibge").primaryKey(),
+  municipio: text("municipio").notNull(),
+  municipioNormalizado: text("municipio_normalizado").notNull(),
+  uf: text("uf").notNull(),
+  capag: text("capag").notNull(),
+  indicador1: numeric("indicador_1", { precision: 14, scale: 6 }),
+  nota1: text("nota_1"),
+  indicador2: numeric("indicador_2", { precision: 14, scale: 6 }),
+  nota2: text("nota_2"),
+  indicador3: numeric("indicador_3", { precision: 14, scale: 6 }),
+  nota3: text("nota_3"),
+  anoBase: text("ano_base"),
+  importadoEm: timestamp("importado_em", { withTimezone: true })
     .notNull()
     .defaultNow(),
 });

@@ -14,7 +14,11 @@ export type LicitacaoRow = typeof licitacoes.$inferSelect;
 export function LicitacoesClient({
   resultados,
 }: {
-  resultados: { match: MatchRow; licitacao: LicitacaoRow }[];
+  resultados: {
+    match: MatchRow;
+    licitacao: LicitacaoRow;
+    produtosRelacionados: string[];
+  }[];
 }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -70,7 +74,7 @@ export function LicitacoesClient({
             Nenhuma licitação encontrada para esse filtro.
           </div>
         )}
-        {filtrados.map(({ match, licitacao }) => {
+        {filtrados.map(({ match, licitacao, produtosRelacionados }) => {
           const score = scoreMeta(Number(match.matchScore ?? 0));
           return (
             <div
@@ -93,6 +97,19 @@ export function LicitacoesClient({
                   {score.label}
                 </span>
               </div>
+
+              {produtosRelacionados.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {produtosRelacionados.map((nome) => (
+                    <span
+                      key={nome}
+                      className="rounded-full bg-[#E3F5EC] px-2 py-0.5 text-[10.5px] font-bold text-[#12896B]"
+                    >
+                      {nome}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {match.matchReason && (
                 <div className="flex gap-2 rounded-[10px] border border-[#E7E1FF] bg-[#F7F5FF] px-3 py-2.5">

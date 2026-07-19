@@ -115,7 +115,7 @@ export function PropostaDocument({ data }: { data: PropostaPdfData }) {
           </>
         )}
 
-        <Text style={styles.secaoTitulo}>6. Cronograma de Implantação</Text>
+        <Text style={styles.secaoTitulo}>6. Cronograma de Execução/Entrega</Text>
         <Text style={styles.paragrafo}>{data.cronogramaImplantacao || "-"}</Text>
 
         <Text style={styles.secaoTitulo}>7. Valor e Prazo de Validade</Text>

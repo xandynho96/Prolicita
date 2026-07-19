@@ -3,12 +3,15 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { empresaLicitacaoMatches, licitacoes } from "@/lib/db/schema";
+import { empresaLicitacaoMatches, licitacoes, produtosServicos } from "@/lib/db/schema";
 import { getEmpresaDoUsuario } from "@/lib/empresa";
 import { garantirLinkEdital } from "@/lib/pncp/sync";
 import { formatarValor } from "@/lib/format";
 import { scoreMeta } from "@/lib/matching/score-meta";
+import { produtosRelacionados } from "@/lib/matching/keyword-filter";
 import { labelCampoPncp } from "@/lib/pncp/labels";
+import { buscarCapag } from "@/lib/capag/lookup";
+import { capagMeta } from "@/lib/capag/meta";
 import { Button } from "@/components/ui/button";
 import {
   Tabs,
@@ -63,6 +66,14 @@ export default async function LicitacaoDetalhePage({
   }
 
   const score = scoreMeta(Number(match.matchScore ?? 0));
+  const capag = await buscarCapag(licitacao.municipio, licitacao.uf);
+  const capagInfo = capag ? capagMeta(capag.capag) : null;
+
+  const produtos = await db
+    .select()
+    .from(produtosServicos)
+    .where(eq(produtosServicos.empresaId, empresa.id));
+  const produtosAtendidos = produtosRelacionados(licitacao.objeto, produtos);
 
   return (
     <div className="flex flex-col gap-5">
@@ -92,7 +103,28 @@ export default async function LicitacaoDetalhePage({
             <span className="text-[14px] font-bold">
               {formatarValor(licitacao.valorEstimado)}
             </span>
+            {capagInfo && (
+              <span
+                title={capagInfo.descricao}
+                className="rounded-full px-2.5 py-1 text-[11.5px] font-bold"
+                style={{ background: capagInfo.bg, color: capagInfo.color }}
+              >
+                {capagInfo.label}
+              </span>
+            )}
           </div>
+          {produtosAtendidos.length > 0 && (
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              {produtosAtendidos.map((produto) => (
+                <span
+                  key={produto.id}
+                  className="rounded-full bg-[#E3F5EC] px-2.5 py-1 text-[11px] font-bold text-[#12896B]"
+                >
+                  {produto.nome}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <Tabs defaultValue="resumo" className="flex flex-1 flex-col gap-0">
@@ -125,6 +157,29 @@ export default async function LicitacaoDetalhePage({
                   </div>
                   <p className="text-[13.5px] leading-relaxed text-[#453F58]">
                     {match.matchReason}
+                  </p>
+                </div>
+              )}
+              {capagInfo && (
+                <div
+                  className="rounded-xl border px-4 py-3.5"
+                  style={{ borderColor: capagInfo.bg, background: capagInfo.bg }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10.5px] font-extrabold"
+                      style={{ color: capagInfo.color }}
+                    >
+                      {capagInfo.label}
+                    </span>
+                  </div>
+                  <p
+                    className="mt-1 text-[12.5px] leading-relaxed"
+                    style={{ color: capagInfo.color }}
+                  >
+                    {capagInfo.descricao} — capacidade de pagamento do
+                    município ({licitacao.municipio}/{licitacao.uf}) segundo
+                    o Tesouro Nacional.
                   </p>
                 </div>
               )}

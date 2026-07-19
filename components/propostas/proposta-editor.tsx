@@ -18,7 +18,7 @@ const CAMPOS: { key: keyof Proposta; label: string; rows: number }[] = [
   { key: "apresentacaoEmpresa", label: "1. Apresentação da empresa", rows: 4 },
   { key: "objetoOfertado", label: "2. Objeto ofertado", rows: 3 },
   { key: "especificacaoTecnica", label: "3. Especificação técnica", rows: 6 },
-  { key: "cronogramaImplantacao", label: "4. Cronograma de implantação", rows: 4 },
+  { key: "cronogramaImplantacao", label: "4. Cronograma de execução/entrega", rows: 4 },
   { key: "detalhamentoValor", label: "5. Detalhamento do valor", rows: 3 },
   { key: "declaracoes", label: "6. Declarações", rows: 3 },
 ];

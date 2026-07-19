@@ -81,6 +81,7 @@ export const empresaSchema = z.object({
 
 export const produtoCreateSchema = z.object({
   nome: texto(LIMITES.TEXTO_CURTO).min(1, "Informe o nome do produto"),
+  tipo: z.enum(["produto", "servico"]).optional(),
   descricaoResumida: texto(LIMITES.TEXTO_MEDIO).min(
     1,
     "Informe uma descrição resumida"
@@ -90,6 +91,7 @@ export const produtoCreateSchema = z.object({
 
 export const produtoUpdateSchema = z.object({
   nome: textoOpcional(LIMITES.TEXTO_CURTO),
+  tipo: z.enum(["produto", "servico"]).optional(),
   descricaoResumida: textoOpcional(LIMITES.TEXTO_MEDIO),
   descricaoDetalhada: textoOpcional(LIMITES.TEXTO_LONGO),
 });

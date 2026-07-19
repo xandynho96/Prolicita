@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PillToggle } from "@/components/ui/pill-toggle";
 import {
   Card,
   CardContent,
@@ -15,14 +16,22 @@ import {
 } from "@/components/ui/card";
 import { Trash2, Plus } from "lucide-react";
 
+type Tipo = "produto" | "servico";
+
 interface Produto {
   id: string;
   nome: string;
+  tipo: Tipo;
   descricaoResumida: string;
   descricaoDetalhada: string | null;
 }
 
-const NOVO = { nome: "", descricaoResumida: "", descricaoDetalhada: "" };
+const NOVO = {
+  nome: "",
+  tipo: "servico" as Tipo,
+  descricaoResumida: "",
+  descricaoDetalhada: "",
+};
 
 export function ProdutosForm() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -49,6 +58,7 @@ export function ProdutosForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nome: novo.nome,
+        tipo: novo.tipo,
         descricaoResumida: novo.descricaoResumida,
         descricaoDetalhada: novo.descricaoDetalhada || undefined,
       }),
@@ -101,7 +111,12 @@ export function ProdutosForm() {
             className="flex items-start justify-between gap-3 rounded-lg border border-border p-3"
           >
             <div className="min-w-0">
-              <div className="text-sm font-semibold">{produto.nome}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold">{produto.nome}</span>
+                <span className="rounded-full bg-accent px-2 py-0.5 text-[10.5px] font-bold text-muted-foreground">
+                  {produto.tipo === "produto" ? "Produto" : "Serviço"}
+                </span>
+              </div>
               <div className="mt-0.5 text-sm text-muted-foreground">
                 {produto.descricaoResumida}
               </div>
@@ -119,6 +134,23 @@ export function ProdutosForm() {
 
         {adicionando ? (
           <div className="space-y-3 rounded-lg border border-border p-3">
+            <div className="space-y-2">
+              <Label className="text-xs">Tipo</Label>
+              <div className="flex gap-2">
+                <PillToggle
+                  active={novo.tipo === "produto"}
+                  onClick={() => setNovo((n) => ({ ...n, tipo: "produto" }))}
+                >
+                  Produto
+                </PillToggle>
+                <PillToggle
+                  active={novo.tipo === "servico"}
+                  onClick={() => setNovo((n) => ({ ...n, tipo: "servico" }))}
+                >
+                  Serviço
+                </PillToggle>
+              </div>
+            </div>
             <div className="space-y-2">
               <Label className="text-xs">Nome do produto/serviço</Label>
               <Input

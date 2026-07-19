@@ -110,6 +110,7 @@ export default function PerfilPage() {
   const [form, setForm] = useState<EmpresaForm>(vazio);
   const [loading, setLoading] = useState(false);
   const [carregando, setCarregando] = useState(true);
+  const [buscandoCnpj, setBuscandoCnpj] = useState(false);
 
   useEffect(() => {
     fetch("/api/empresa")
@@ -207,6 +208,44 @@ export default function PerfilPage() {
         i === index ? { ...c, [campo]: valor } : c
       ),
     }));
+  };
+
+  const handleBuscarCnpj = async () => {
+    const digitos = form.cnpj.replace(/\D/g, "");
+    if (digitos.length !== 14) {
+      toast.error("Informe um CNPJ completo antes de buscar");
+      return;
+    }
+    setBuscandoCnpj(true);
+    try {
+      const res = await fetch(`/api/cnpj/${digitos}`);
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Não foi possível consultar o CNPJ");
+        return;
+      }
+      const d = data.dados;
+      setForm((f) => ({
+        ...f,
+        razaoSocial: d.razaoSocial || f.razaoSocial,
+        nomeFantasia: d.nomeFantasia || f.nomeFantasia,
+        porte: d.porte || f.porte,
+        telefone: d.telefone ? maskTelefone(d.telefone) : f.telefone,
+        email: d.email || f.email,
+        logradouro: d.logradouro || f.logradouro,
+        enderecoNumero: d.numero || f.enderecoNumero,
+        bairro: d.bairro || f.bairro,
+        cep: d.cep ? maskCep(d.cep) : f.cep,
+        municipio: d.municipio || f.municipio,
+        uf: d.uf || f.uf,
+        cnaesTexto: d.cnaes?.length ? d.cnaes.join(", ") : f.cnaesTexto,
+      }));
+      toast.success("Dados do CNPJ preenchidos — revise antes de salvar");
+    } catch {
+      toast.error("Não foi possível consultar o CNPJ");
+    } finally {
+      setBuscandoCnpj(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -319,13 +358,23 @@ export default function PerfilPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="cnpj">CNPJ</Label>
-                <Input
-                  id="cnpj"
-                  required
-                  value={form.cnpj}
-                  onChange={handleMaskedChange("cnpj", maskCnpj)}
-                  placeholder="00.000.000/0001-00"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="cnpj"
+                    required
+                    value={form.cnpj}
+                    onChange={handleMaskedChange("cnpj", maskCnpj)}
+                    placeholder="00.000.000/0001-00"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBuscarCnpj}
+                    disabled={buscandoCnpj}
+                  >
+                    {buscandoCnpj ? "Buscando..." : "Buscar CNPJ"}
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="porte">Porte</Label>
