@@ -8,6 +8,7 @@ import { getEmpresaDoUsuario } from "@/lib/empresa";
 import { garantirLinkEdital } from "@/lib/pncp/sync";
 import { formatarValor } from "@/lib/format";
 import { scoreMeta } from "@/lib/matching/score-meta";
+import { labelCampoPncp } from "@/lib/pncp/labels";
 import { Button } from "@/components/ui/button";
 import {
   Tabs,
@@ -170,16 +171,18 @@ export default async function LicitacaoDetalhePage({
 
             <TabsContent value="pncp">
               <div className="mb-1 text-[11.5px] font-bold uppercase tracking-wide text-muted-foreground">
-                Dados brutos do PNCP
+                Dados do PNCP
               </div>
-              <div className="rounded-xl border border-border bg-[#F9FAFB] px-4 font-mono text-[12.5px] shadow-sm">
+              <div className="rounded-xl border border-border bg-[#F9FAFB] px-4 text-[12.5px] shadow-sm">
                 {pncpEntries(licitacao.rawJson).map((entry) => (
                   <div
                     key={entry.key}
                     className="flex justify-between gap-3 border-b border-[#EEF0F3] py-2.5 last:border-0"
                   >
-                    <span className="text-muted-foreground">{entry.key}</span>
-                    <span className="text-right">{entry.value}</span>
+                    <span className="text-muted-foreground">
+                      {labelCampoPncp(entry.key)}
+                    </span>
+                    <span className="text-right font-mono">{entry.value}</span>
                   </div>
                 ))}
               </div>

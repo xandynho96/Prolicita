@@ -73,6 +73,7 @@ export default async function DocumentosPage() {
     <DocumentosClient
       documentos={listaDocumentos}
       licitacoes={licitacoesRelevantes.map((l) => l.licitacao)}
+      empresaUf={empresa.uf}
     />
   );
 }

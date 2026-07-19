@@ -9,6 +9,7 @@ import {
   CHECKLIST_GRUPO_META,
   type ChecklistItem,
 } from "@/lib/documentos/checklist";
+import { linkConsultaCertidao } from "@/lib/documentos/consulta-links";
 import { formatarDiasLabel } from "@/lib/documentos/status";
 import { UploadDialog } from "./upload-dialog";
 import { DocumentoSheet } from "./documento-sheet";
@@ -36,9 +37,11 @@ function statusDoItem(doc: DocumentoRow | undefined) {
 export function DocumentosClient({
   documentos: documentosIniciais,
   licitacoes,
+  empresaUf,
 }: {
   documentos: DocumentoRow[];
   licitacoes: LicitacaoRow[];
+  empresaUf: string | null;
 }) {
   const [docs, setDocs] = useState(documentosIniciais);
   const [uploadContexto, setUploadContexto] = useState<
@@ -184,6 +187,21 @@ export function DocumentosClient({
                       </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-2.5">
+                      {(() => {
+                        const link = linkConsultaCertidao(item.id, empresaUf);
+                        return (
+                          link && (
+                            <a
+                              href={link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="whitespace-nowrap text-[12px] font-bold text-primary hover:underline"
+                            >
+                              Consultar ↗
+                            </a>
+                          )
+                        );
+                      })()}
                       <span
                         className="whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-bold"
                         style={{ background: status.bg, color: status.color }}
