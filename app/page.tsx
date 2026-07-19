@@ -7,6 +7,7 @@ import { Hero } from "@/components/landing/hero";
 import { ComoFunciona } from "@/components/landing/como-funciona";
 import { Features } from "@/components/landing/features";
 import { ScreenshotShowcase } from "@/components/landing/screenshot-showcase";
+import { Pricing } from "@/components/landing/pricing";
 import { Cta } from "@/components/landing/cta";
 import { LandingFooter } from "@/components/landing/footer";
 
@@ -23,10 +24,10 @@ export default async function Home() {
           <Image
             src="/logo-prolicita.png"
             alt="ProLicita"
-            width={160}
-            height={36}
+            width={220}
+            height={71}
             priority
-            className="h-8 w-auto"
+            className="h-11 w-auto"
           />
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -44,6 +45,7 @@ export default async function Home() {
         <ComoFunciona />
         <Features />
         <ScreenshotShowcase />
+        <Pricing />
         <Cta />
       </main>
 

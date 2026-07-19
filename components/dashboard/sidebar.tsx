@@ -37,8 +37,8 @@ export function DashboardSidebar() {
       <Image
         src="/logo-prolicita.png"
         alt="ProLicita"
-        width={220}
-        height={48}
+        width={547}
+        height={177}
         priority
         className="h-auto w-full px-1"
       />

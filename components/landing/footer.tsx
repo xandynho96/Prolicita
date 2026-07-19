@@ -9,9 +9,9 @@ export function LandingFooter() {
         <Image
           src="/logo-prolicita.png"
           alt="ProLicita"
-          width={140}
-          height={32}
-          className="h-7 w-auto"
+          width={190}
+          height={61}
+          className="h-9 w-auto"
         />
         <div className="flex items-center gap-5 text-[13px] text-muted-foreground">
           <Link href="/login" className="hover:text-foreground">

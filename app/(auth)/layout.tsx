@@ -11,8 +11,8 @@ export default function AuthLayout({
         <Image
           src="/logo-prolicita.png"
           alt="ProLicita"
-          width={220}
-          height={48}
+          width={547}
+          height={177}
           priority
           className="mx-auto h-auto w-[220px]"
         />
