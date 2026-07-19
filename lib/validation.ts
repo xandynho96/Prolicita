@@ -70,6 +70,28 @@ export const empresaSchema = z.object({
   buscarBrasilTodo: z.boolean().default(false),
   modalidades: z.array(z.number()).max(LIMITES.ARRAY_PEQUENO),
   contatosWhatsapp: z.array(contatoWhatsappSchema).max(20),
+  representanteLegalNome: textoOpcional(LIMITES.TEXTO_CURTO),
+  representanteLegalCpf: z
+    .string()
+    .max(14)
+    .optional()
+    .transform((v) => (v ? v.replace(/\D/g, "") : v)),
+  representanteLegalCargo: textoOpcional(LIMITES.TEXTO_CURTO),
+});
+
+export const produtoCreateSchema = z.object({
+  nome: texto(LIMITES.TEXTO_CURTO).min(1, "Informe o nome do produto"),
+  descricaoResumida: texto(LIMITES.TEXTO_MEDIO).min(
+    1,
+    "Informe uma descrição resumida"
+  ),
+  descricaoDetalhada: textoOpcional(LIMITES.TEXTO_LONGO),
+});
+
+export const produtoUpdateSchema = z.object({
+  nome: textoOpcional(LIMITES.TEXTO_CURTO),
+  descricaoResumida: textoOpcional(LIMITES.TEXTO_MEDIO),
+  descricaoDetalhada: textoOpcional(LIMITES.TEXTO_LONGO),
 });
 
 export const oportunidadeUpdateSchema = z.object({
@@ -114,6 +136,29 @@ export const prazoUpdateSchema = z.object({
   data: z.string().max(40).optional(),
   concluido: z.boolean().optional(),
   observacoes: textoOpcional(LIMITES.TEXTO_LONGO),
+});
+
+export const propostaCreateSchema = z.object({
+  licitacaoId: z.string().uuid(),
+});
+
+export const propostaUpdateSchema = z.object({
+  produtosSelecionadosIds: z.array(z.string().uuid()).max(LIMITES.ARRAY_PEQUENO).optional(),
+  apresentacaoEmpresa: textoOpcional(LIMITES.TEXTO_LONGO),
+  objetoOfertado: textoOpcional(LIMITES.TEXTO_LONGO),
+  especificacaoTecnica: textoOpcional(LIMITES.TEXTO_LONGO),
+  cronogramaImplantacao: textoOpcional(LIMITES.TEXTO_LONGO),
+  valorTotal: z
+    .number()
+    .nonnegative()
+    .max(1_000_000_000_000)
+    .optional()
+    .transform((v) => v?.toString()),
+  detalhamentoValor: textoOpcional(LIMITES.TEXTO_LONGO),
+  prazoValidadeDias: z.number().int().positive().max(3650).optional(),
+  prazoExecucaoDias: z.number().int().positive().max(3650).optional(),
+  declaracoes: textoOpcional(LIMITES.TEXTO_LONGO),
+  status: z.enum(["rascunho", "finalizada"]).optional(),
 });
 
 export const documentoManualSchema = z.object({

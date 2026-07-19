@@ -61,6 +61,11 @@ export const prazoTipoEnum = pgEnum("prazo_tipo", [
   "outro",
 ]);
 
+export const propostaStatusEnum = pgEnum("proposta_status", [
+  "rascunho",
+  "finalizada",
+]);
+
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
@@ -106,6 +111,22 @@ export const empresas = pgTable("empresas", {
     .$type<{ nome: string; numero: string }[]>()
     .notNull()
     .default([]),
+  representanteLegalNome: text("representante_legal_nome"),
+  representanteLegalCpf: text("representante_legal_cpf"),
+  representanteLegalCargo: text("representante_legal_cargo"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const produtosServicos = pgTable("produtos_servicos", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  empresaId: uuid("empresa_id")
+    .notNull()
+    .references(() => empresas.id, { onDelete: "cascade" }),
+  nome: text("nome").notNull(),
+  descricaoResumida: text("descricao_resumida").notNull(),
+  descricaoDetalhada: text("descricao_detalhada"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -260,6 +281,69 @@ export const prazos = pgTable("prazos", {
     .defaultNow(),
 });
 
+export const propostas = pgTable(
+  "propostas",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    empresaId: uuid("empresa_id")
+      .notNull()
+      .references(() => empresas.id, { onDelete: "cascade" }),
+    licitacaoId: uuid("licitacao_id")
+      .notNull()
+      .references(() => licitacoes.id, { onDelete: "cascade" }),
+    oportunidadeId: uuid("oportunidade_id").references(
+      () => oportunidades.id,
+      { onDelete: "set null" }
+    ),
+    status: propostaStatusEnum("status").notNull().default("rascunho"),
+    produtosSelecionadosIds: jsonb("produtos_selecionados_ids")
+      .$type<string[]>()
+      .notNull()
+      .default([]),
+    apresentacaoEmpresa: text("apresentacao_empresa"),
+    objetoOfertado: text("objeto_ofertado"),
+    especificacaoTecnica: text("especificacao_tecnica"),
+    cronogramaImplantacao: text("cronograma_implantacao"),
+    valorTotal: numeric("valor_total", { precision: 18, scale: 2 }),
+    detalhamentoValor: text("detalhamento_valor"),
+    prazoValidadeDias: integer("prazo_validade_dias").notNull().default(60),
+    prazoExecucaoDias: integer("prazo_execucao_dias"),
+    declaracoes: text("declaracoes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [unique().on(table.empresaId, table.licitacaoId)]
+);
+
+export const produtosServicosRelations = relations(
+  produtosServicos,
+  ({ one }) => ({
+    empresa: one(empresas, {
+      fields: [produtosServicos.empresaId],
+      references: [empresas.id],
+    }),
+  })
+);
+
+export const propostasRelations = relations(propostas, ({ one }) => ({
+  empresa: one(empresas, {
+    fields: [propostas.empresaId],
+    references: [empresas.id],
+  }),
+  licitacao: one(licitacoes, {
+    fields: [propostas.licitacaoId],
+    references: [licitacoes.id],
+  }),
+  oportunidade: one(oportunidades, {
+    fields: [propostas.oportunidadeId],
+    references: [oportunidades.id],
+  }),
+}));
+
 export const oportunidadesRelations = relations(
   oportunidades,
   ({ one, many }) => ({
@@ -301,6 +385,8 @@ export const empresasRelations = relations(empresas, ({ one, many }) => ({
   documentos: many(documentos),
   oportunidades: many(oportunidades),
   prazos: many(prazos),
+  produtosServicos: many(produtosServicos),
+  propostas: many(propostas),
 }));
 
 export const licitacoesRelations = relations(licitacoes, ({ many }) => ({

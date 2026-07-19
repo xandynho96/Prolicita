@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   Sheet,
@@ -72,6 +73,7 @@ function OportunidadeSheetContent({
   onPrazoCriado: (prazo: PrazoRow) => void;
 }) {
   const { oportunidade, licitacao } = item;
+  const router = useRouter();
 
   const [etapa, setEtapa] = useState(oportunidade.etapa);
   const etapaMeta = ETAPA_META[etapa];
@@ -81,6 +83,7 @@ function OportunidadeSheetContent({
   );
   const [observacoes, setObservacoes] = useState(oportunidade.observacoes ?? "");
   const [saving, setSaving] = useState(false);
+  const [gerandoProposta, setGerandoProposta] = useState(false);
   const [novoPrazoOpen, setNovoPrazoOpen] = useState(false);
   const [prazoTitulo, setPrazoTitulo] = useState("");
   const [prazoTipo, setPrazoTipo] = useState<string>("outro");
@@ -106,6 +109,22 @@ function OportunidadeSheetContent({
     }
     onUpdated(data.oportunidade);
     toast.success("Oportunidade atualizada");
+  };
+
+  const gerarProposta = async () => {
+    setGerandoProposta(true);
+    const res = await fetch("/api/propostas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ licitacaoId: licitacao.id }),
+    });
+    const data = await res.json();
+    setGerandoProposta(false);
+    if (!res.ok) {
+      toast.error(data.error ?? "Falha ao gerar proposta");
+      return;
+    }
+    router.push(`/propostas/${data.proposta.id}`);
   };
 
   const criarPrazo = async () => {
@@ -223,9 +242,21 @@ function OportunidadeSheetContent({
             onChange={(e) => setObservacoes(e.target.value)}
           />
         </div>
-        <Button onClick={salvar} disabled={saving} className="self-start">
-          {saving ? "Salvando..." : "Salvar alterações"}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={salvar} disabled={saving}>
+            {saving ? "Salvando..." : "Salvar alterações"}
+          </Button>
+          {etapa !== "identificada" && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={gerarProposta}
+              disabled={gerandoProposta}
+            >
+              {gerandoProposta ? "Gerando..." : "Gerar proposta"}
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border p-6">

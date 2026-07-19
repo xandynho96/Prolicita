@@ -15,6 +15,7 @@ import {
   LogOut,
   Kanban,
   CalendarDays,
+  FileSignature,
 } from "lucide-react";
 
 const links = [
@@ -22,6 +23,7 @@ const links = [
   { href: "/licitacoes", label: "Licitações", icon: FileText },
   { href: "/oportunidades", label: "Pipeline", icon: Kanban },
   { href: "/prazos", label: "Prazos", icon: CalendarDays },
+  { href: "/propostas", label: "Propostas", icon: FileSignature },
   { href: "/documentos", label: "Documentos", icon: FolderOpen },
   { href: "/notificacoes", label: "Notificações", icon: Bell },
   { href: "/perfil", label: "Perfil", icon: Building2 },

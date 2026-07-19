@@ -1,6 +1,11 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { empresaLicitacaoMatches, empresas, licitacoes } from "@/lib/db/schema";
+import {
+  empresaLicitacaoMatches,
+  empresas,
+  licitacoes,
+  produtosServicos,
+} from "@/lib/db/schema";
 import { passaFiltroPreliminar } from "./keyword-filter";
 import { avaliarMatchIA } from "./ai-match";
 import {
@@ -31,9 +36,15 @@ async function buscarCandidatosSemMatch(empresaId: string) {
 }
 
 async function processarEmpresa(empresa: typeof empresas.$inferSelect) {
-  const candidatos = await buscarCandidatosSemMatch(empresa.id);
+  const [candidatos, produtos] = await Promise.all([
+    buscarCandidatosSemMatch(empresa.id),
+    db
+      .select()
+      .from(produtosServicos)
+      .where(eq(produtosServicos.empresaId, empresa.id)),
+  ]);
   const preFiltrados = candidatos.filter((lic) =>
-    passaFiltroPreliminar(empresa, lic)
+    passaFiltroPreliminar(empresa, lic, produtos)
   );
 
   const matchesEncontrados: {
@@ -47,7 +58,14 @@ async function processarEmpresa(empresa: typeof empresas.$inferSelect) {
         descricaoPerfil: empresa.descricaoPerfil,
         palavrasChave: empresa.palavrasChave,
         cnaes: empresa.cnaes,
+        produtos: produtos.map((p) => ({
+          nome: p.nome,
+          descricaoResumida: p.descricaoResumida,
+        })),
+        valorMinimo: empresa.valorMinimo,
+        valorMaximo: empresa.valorMaximo,
         objetoLicitacao: licitacao.objeto,
+        valorEstimadoLicitacao: licitacao.valorEstimado,
         modalidade: licitacao.modalidade,
         orgaoNome: licitacao.orgaoNome,
       });

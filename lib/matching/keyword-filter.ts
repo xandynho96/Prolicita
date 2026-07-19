@@ -1,7 +1,8 @@
-import { licitacoes, empresas } from "@/lib/db/schema";
+import { licitacoes, empresas, produtosServicos } from "@/lib/db/schema";
 
 type Empresa = typeof empresas.$inferSelect;
 type Licitacao = typeof licitacoes.$inferSelect;
+type Produto = typeof produtosServicos.$inferSelect;
 
 function normalizar(texto: string): string {
   return texto
@@ -50,12 +51,16 @@ function ufsDeInteresse(empresa: Empresa): string[] | null {
 
 /**
  * Pré-filtro barato (sem IA): decide se uma licitação merece ser avaliada
- * pela IA para uma empresa, com base em região, modalidade, faixa de valor
- * e interseção de termos.
+ * pela IA para uma empresa, com base em região, modalidade e interseção de
+ * termos. A faixa de valor NÃO é usada aqui para descartar — vira contexto
+ * passado à IA (ver `avaliarMatchIA`), porque um corte automático por valor
+ * descarta oportunidades reais (ex.: implantação de um único módulo em
+ * município pequeno) antes de a IA sequer avaliar o objeto.
  */
 export function passaFiltroPreliminar(
   empresa: Empresa,
-  licitacao: Licitacao
+  licitacao: Licitacao,
+  produtos: Produto[] = []
 ): boolean {
   const ufs = ufsDeInteresse(empresa);
   if (ufs && licitacao.uf && !ufs.includes(licitacao.uf)) {
@@ -70,24 +75,13 @@ export function passaFiltroPreliminar(
     return false;
   }
 
-  if (licitacao.valorEstimado != null) {
-    const valor = Number(licitacao.valorEstimado);
-    // PNCP costuma usar 0 para "valor não divulgado" (ex.: dispensas
-    // sigilosas). Trata como se o valor não tivesse sido informado, em vez
-    // de descartar como "abaixo do mínimo".
-    if (valor > 0) {
-      if (empresa.valorMinimo != null && valor < Number(empresa.valorMinimo)) {
-        return false;
-      }
-      if (empresa.valorMaximo != null && valor > Number(empresa.valorMaximo)) {
-        return false;
-      }
-    }
-  }
-
   const termos = new Set([
     ...empresa.palavrasChave.map((p) => normalizar(p)),
     ...(empresa.descricaoPerfil ? extrairTermos(empresa.descricaoPerfil) : []),
+    ...produtos.flatMap((p) => [
+      ...extrairTermos(p.nome),
+      ...extrairTermos(p.descricaoResumida),
+    ]),
   ]);
 
   if (termos.size === 0) {

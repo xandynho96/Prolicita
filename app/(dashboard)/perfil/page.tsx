@@ -28,11 +28,13 @@ import { Trash2, Plus } from "lucide-react";
 import {
   maskCep,
   maskCnpj,
+  maskCpf,
   maskMoeda,
   maskTelefone,
   maskWhatsapp,
   numeroParaMascaraMoeda,
 } from "@/lib/masks";
+import { ProdutosForm } from "@/components/perfil/produtos-form";
 
 interface Contato {
   nome: string;
@@ -63,6 +65,9 @@ interface EmpresaForm {
   buscarBrasilTodo: boolean;
   modalidades: number[];
   contatosWhatsapp: Contato[];
+  representanteLegalNome: string;
+  representanteLegalCpf: string;
+  representanteLegalCargo: string;
 }
 
 const vazio: EmpresaForm = {
@@ -89,6 +94,9 @@ const vazio: EmpresaForm = {
   buscarBrasilTodo: false,
   modalidades: [],
   contatosWhatsapp: [],
+  representanteLegalNome: "",
+  representanteLegalCpf: "",
+  representanteLegalCargo: "",
 };
 
 const PORTES = [
@@ -135,6 +143,9 @@ export default function PerfilPage() {
             contatosWhatsapp: (e.contatosWhatsapp ?? []).map(
               (c: Contato) => ({ ...c, numero: maskWhatsapp(c.numero) })
             ),
+            representanteLegalNome: e.representanteLegalNome ?? "",
+            representanteLegalCpf: maskCpf(e.representanteLegalCpf ?? ""),
+            representanteLegalCargo: e.representanteLegalCargo ?? "",
           });
         }
       })
@@ -240,6 +251,9 @@ export default function PerfilPage() {
       buscarBrasilTodo: form.buscarBrasilTodo,
       modalidades: form.modalidades,
       contatosWhatsapp: contatosValidos,
+      representanteLegalNome: form.representanteLegalNome || undefined,
+      representanteLegalCpf: form.representanteLegalCpf || undefined,
+      representanteLegalCargo: form.representanteLegalCargo || undefined,
     };
 
     const res = await fetch("/api/empresa", {
@@ -382,6 +396,44 @@ export default function PerfilPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle>Representante legal</CardTitle>
+            <CardDescription>
+              Usado na identificação do licitante em propostas geradas pela
+              plataforma
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="representanteLegalNome">Nome completo</Label>
+              <Input
+                id="representanteLegalNome"
+                value={form.representanteLegalNome}
+                onChange={handleChange("representanteLegalNome")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="representanteLegalCpf">CPF</Label>
+              <Input
+                id="representanteLegalCpf"
+                value={form.representanteLegalCpf}
+                onChange={handleMaskedChange("representanteLegalCpf", maskCpf)}
+                placeholder="000.000.000-00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="representanteLegalCargo">Cargo</Label>
+              <Input
+                id="representanteLegalCargo"
+                value={form.representanteLegalCargo}
+                onChange={handleChange("representanteLegalCargo")}
+                placeholder="Ex: Sócio-administrador"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Endereço</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -512,6 +564,8 @@ export default function PerfilPage() {
             </div>
           </CardContent>
         </Card>
+
+        <ProdutosForm />
 
         <Card>
           <CardHeader>
