@@ -24,10 +24,10 @@ export default async function Home() {
           <Image
             src="/logo-prolicita.png"
             alt="ProLicita"
-            width={220}
-            height={71}
+            width={280}
+            height={90}
             priority
-            className="h-11 w-auto"
+            className="h-14 w-auto"
           />
           <div className="flex items-center gap-3">
             <Link href="/login">
