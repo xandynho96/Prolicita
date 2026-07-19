@@ -33,6 +33,8 @@ export const documentoCategoriaEnum = pgEnum("documento_categoria", [
   "juridico",
   "fiscal",
   "tecnico",
+  "economico",
+  "declaracoes",
   "propostas",
   "editais",
 ]);
@@ -51,6 +53,7 @@ export const oportunidadeEtapaEnum = pgEnum("oportunidade_etapa", [
   "aguardando_resultado",
   "ganha",
   "perdida",
+  "ignorada",
 ]);
 
 export const prazoTipoEnum = pgEnum("prazo_tipo", [
@@ -220,6 +223,9 @@ export const documentos = pgTable("documentos", {
   arquivoMime: text("arquivo_mime"),
   arquivoNomeOriginal: text("arquivo_nome_original"),
   arquivoTamanho: integer("arquivo_tamanho"),
+  checklistItemId: text("checklist_item_id"),
+  conformeLei14133: boolean("conforme_lei14133"),
+  motivoConformidade: text("motivo_conformidade"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

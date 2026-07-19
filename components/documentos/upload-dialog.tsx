@@ -20,6 +20,7 @@ import {
 import { CATEGORIA_META } from "@/lib/documentos/meta";
 import { STATUS_META } from "@/lib/documentos/meta";
 import { formatarDiasLabel } from "@/lib/documentos/status";
+import type { ChecklistItem } from "@/lib/documentos/checklist";
 import type { DocumentoRow, LicitacaoRow } from "./documentos-client";
 
 type Estagio = "idle" | "uploading" | "analyzing" | "done";
@@ -28,11 +29,13 @@ export function UploadDialog({
   open,
   onOpenChange,
   licitacoes,
+  checklistItem,
   onUploaded,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   licitacoes: LicitacaoRow[];
+  checklistItem?: ChecklistItem | null;
   onUploaded: (doc: DocumentoRow) => void;
 }) {
   const [categoria, setCategoria] = useState("juridico");
@@ -58,7 +61,11 @@ export function UploadDialog({
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("categoria", categoria);
+    if (checklistItem) {
+      formData.append("checklistItemId", checklistItem.id);
+    } else {
+      formData.append("categoria", categoria);
+    }
     if (licitacaoId) formData.append("licitacaoId", licitacaoId);
 
     setTimeout(() => setEstagio("analyzing"), 400);
@@ -93,28 +100,36 @@ export function UploadDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
-          <DialogTitle>Enviar documento</DialogTitle>
+          <DialogTitle>
+            {checklistItem ? `Enviar: ${checklistItem.nome}` : "Enviar documento"}
+          </DialogTitle>
         </DialogHeader>
 
         {estagio === "idle" && (
           <div className="flex flex-col gap-4">
-            <div className="space-y-2">
-              <Label>Categoria</Label>
-              <Select value={categoria} onValueChange={(v) => setCategoria(v ?? "juridico")}>
-                <SelectTrigger>
-                  <SelectValue>
-                    {(v: string) => CATEGORIA_META[v]?.label ?? v}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(CATEGORIA_META).map(([key, meta]) => (
-                    <SelectItem key={key} value={key}>
-                      {meta.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {checklistItem ? (
+              <div className="rounded-lg border border-border bg-[#F9FAFB] px-3.5 py-3 text-xs text-muted-foreground">
+                Base legal: {checklistItem.baseLegal}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label>Categoria</Label>
+                <Select value={categoria} onValueChange={(v) => setCategoria(v ?? "juridico")}>
+                  <SelectTrigger>
+                    <SelectValue>
+                      {(v: string) => CATEGORIA_META[v]?.label ?? v}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(CATEGORIA_META).map(([key, meta]) => (
+                      <SelectItem key={key} value={key}>
+                        {meta.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {licitacoes.length > 0 && (
               <div className="space-y-2">
@@ -190,8 +205,9 @@ export function UploadDialog({
             </div>
             {estagio === "analyzing" && (
               <div className="text-center text-xs text-muted-foreground">
-                Extraindo tipo, número e validade, e comparando com o perfil
-                da empresa
+                {checklistItem
+                  ? "Extraindo dados e avaliando conformidade com a Lei 14.133/21"
+                  : "Extraindo tipo, número e validade, e comparando com o perfil da empresa"}
               </div>
             )}
           </div>
@@ -223,6 +239,29 @@ export function UploadDialog({
                 {STATUS_META[resultado.status].label}
               </span>
             </div>
+            {resultado.checklistItemId && resultado.conformeLei14133 !== null && (
+              <div
+                className="rounded-[10px] border p-3"
+                style={{
+                  borderColor: resultado.conformeLei14133 ? "#C7E8D6" : "#F3C6C6",
+                  background: resultado.conformeLei14133 ? "#E3F5EC" : "#FBE7E7",
+                }}
+              >
+                <div
+                  className="text-[12.5px] font-bold"
+                  style={{ color: resultado.conformeLei14133 ? "#12896B" : "#B23A3A" }}
+                >
+                  {resultado.conformeLei14133
+                    ? "Conforme com o requisito da Lei 14.133/21"
+                    : "Não conforme com o requisito — revise"}
+                </div>
+                {resultado.motivoConformidade && (
+                  <p className="mt-1 text-[12.5px] leading-snug text-[#3A3A3A]">
+                    {resultado.motivoConformidade}
+                  </p>
+                )}
+              </div>
+            )}
             {resultado.aiResumo && (
               <div className="flex gap-2 rounded-[10px] border border-[#E7E1FF] bg-[#F7F5FF] p-3">
                 <span className="h-fit shrink-0 rounded-md bg-[#7C5CFC] px-1.5 py-0.5 text-[9.5px] font-extrabold text-white">

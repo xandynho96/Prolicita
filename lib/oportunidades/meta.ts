@@ -5,6 +5,7 @@ export const ETAPAS = [
   "aguardando_resultado",
   "ganha",
   "perdida",
+  "ignorada",
 ] as const;
 
 export type Etapa = (typeof ETAPAS)[number];
@@ -16,6 +17,7 @@ export const ETAPA_META: Record<Etapa, { label: string; color: string }> = {
   aguardando_resultado: { label: "Aguardando resultado", color: "#7C5CFC" },
   ganha: { label: "Ganha", color: "#12896B" },
   perdida: { label: "Perdida", color: "#B23A3A" },
+  ignorada: { label: "Ignorada", color: "#9AA1AC" },
 };
 
 export const PRAZO_TIPOS = [

@@ -7,6 +7,7 @@ import { getEmpresaDoUsuario } from "@/lib/empresa";
 import { analisarDocumento } from "@/lib/documentos/ai-analyze";
 import { compararComEdital } from "@/lib/documentos/ai-compare";
 import { calcularStatus } from "@/lib/documentos/status";
+import { buscarChecklistItem } from "@/lib/documentos/checklist";
 
 export const maxDuration = 60;
 
@@ -44,7 +45,14 @@ export async function POST(
     );
   }
 
-  const analise = await analisarDocumento(documento.textoExtraido, documento.categoria);
+  const checklistItem = buscarChecklistItem(documento.checklistItemId);
+  const analise = await analisarDocumento(
+    documento.textoExtraido,
+    documento.categoria,
+    checklistItem
+      ? { nome: checklistItem.nome, baseLegal: checklistItem.baseLegal }
+      : undefined
+  );
 
   let aiComparacaoEdital = documento.aiComparacaoEdital ?? [];
   if (documento.licitacaoVinculadaId) {
@@ -75,6 +83,8 @@ export async function POST(
       dataValidade,
       semVencimento,
       status,
+      conformeLei14133: analise.conforme,
+      motivoConformidade: analise.motivoConformidade,
     })
     .where(eq(documentos.id, id))
     .returning({
@@ -95,6 +105,9 @@ export async function POST(
       arquivoMime: documentos.arquivoMime,
       arquivoNomeOriginal: documentos.arquivoNomeOriginal,
       arquivoTamanho: documentos.arquivoTamanho,
+      checklistItemId: documentos.checklistItemId,
+      conformeLei14133: documentos.conformeLei14133,
+      motivoConformidade: documentos.motivoConformidade,
       createdAt: documentos.createdAt,
     });
 

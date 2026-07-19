@@ -101,6 +101,34 @@ export function DocumentoSheet({
                       </div>
                     </div>
                   </div>
+                  {documento.checklistItemId && documento.conformeLei14133 !== null && (
+                    <div
+                      className="rounded-xl border p-4"
+                      style={{
+                        borderColor: documento.conformeLei14133 ? "#C7E8D6" : "#F3C6C6",
+                        background: documento.conformeLei14133 ? "#E3F5EC" : "#FBE7E7",
+                      }}
+                    >
+                      <div
+                        className="text-[12.5px] font-bold"
+                        style={{
+                          color: documento.conformeLei14133 ? "#12896B" : "#B23A3A",
+                        }}
+                      >
+                        {documento.conformeLei14133
+                          ? "Conforme com o requisito da Lei 14.133/21"
+                          : "Não conforme com o requisito — revise"}
+                      </div>
+                      {documento.motivoConformidade && (
+                        <p className="mt-1.5 text-[13px] leading-relaxed text-[#3A3A3A]">
+                          {documento.motivoConformidade}
+                        </p>
+                      )}
+                      <p className="mt-2 text-[11px] text-muted-foreground">
+                        Avaliação automática — não substitui parecer jurídico.
+                      </p>
+                    </div>
+                  )}
                   {documento.aiResumo && (
                     <div className="rounded-xl border border-[#E7E1FF] bg-[#F7F5FF] p-4">
                       <div className="mb-2 flex items-center gap-2">

@@ -35,6 +35,9 @@ export async function GET() {
       arquivoMime: documentos.arquivoMime,
       arquivoNomeOriginal: documentos.arquivoNomeOriginal,
       arquivoTamanho: documentos.arquivoTamanho,
+      checklistItemId: documentos.checklistItemId,
+      conformeLei14133: documentos.conformeLei14133,
+      motivoConformidade: documentos.motivoConformidade,
       createdAt: documentos.createdAt,
     })
     .from(documentos)

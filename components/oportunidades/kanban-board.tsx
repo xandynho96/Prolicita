@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { EyeOff, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,6 +46,7 @@ export function KanbanBoard({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [ignoradaAberta, setIgnoradaAberta] = useState(false);
 
   const moverEtapa = async (oportunidadeId: string, etapa: Etapa) => {
     setItems((list) =>
@@ -111,7 +113,7 @@ export function KanbanBoard({
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4">
-        {ETAPAS.map((etapa) => {
+        {ETAPAS.filter((etapa) => etapa !== "ignorada").map((etapa) => {
           const coluna = items.filter((it) => it.oportunidade.etapa === etapa);
           const meta = ETAPA_META[etapa];
           return (
@@ -147,9 +149,20 @@ export function KanbanBoard({
                       onDragStart={() => setDraggingId(oportunidade.id)}
                       onDragEnd={() => setDraggingId(null)}
                       onClick={() => setSelectedId(oportunidade.id)}
-                      className="flex cursor-grab flex-col gap-2 rounded-[12px] border border-border bg-white p-3.5 shadow-sm active:cursor-grabbing"
+                      className="group relative flex cursor-grab flex-col gap-2 rounded-[12px] border border-border bg-white p-3.5 shadow-sm active:cursor-grabbing"
                     >
-                      <div className="text-[13px] font-bold leading-snug line-clamp-2">
+                      <button
+                        type="button"
+                        title="Ignorar"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          moverEtapa(oportunidade.id, "ignorada");
+                        }}
+                        className="absolute right-2 top-2 rounded-full p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
+                      >
+                        <EyeOff className="h-3.5 w-3.5" />
+                      </button>
+                      <div className="pr-5 text-[13px] font-bold leading-snug line-clamp-2">
                         {licitacao.objeto}
                       </div>
                       <div className="text-[11.5px] text-muted-foreground line-clamp-1">
@@ -181,6 +194,63 @@ export function KanbanBoard({
           );
         })}
       </div>
+
+      {(() => {
+        const colunaIgnorada = items.filter(
+          (it) => it.oportunidade.etapa === "ignorada"
+        );
+        return (
+          <div
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (draggingId) moverEtapa(draggingId, "ignorada");
+              setDraggingId(null);
+            }}
+            className="rounded-xl border border-dashed border-border p-3"
+          >
+            <button
+              type="button"
+              onClick={() => setIgnoradaAberta((v) => !v)}
+              className="flex items-center gap-1.5 text-[12.5px] font-bold text-muted-foreground"
+            >
+              {ignoradaAberta ? (
+                <ChevronDown className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronRight className="h-3.5 w-3.5" />
+              )}
+              Ignoradas ({colunaIgnorada.length})
+            </button>
+
+            {ignoradaAberta && (
+              <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                {colunaIgnorada.map(({ oportunidade, licitacao }) => (
+                  <div
+                    key={oportunidade.id}
+                    draggable
+                    onDragStart={() => setDraggingId(oportunidade.id)}
+                    onDragEnd={() => setDraggingId(null)}
+                    onClick={() => setSelectedId(oportunidade.id)}
+                    className="flex cursor-grab flex-col gap-1.5 rounded-[10px] border border-border bg-accent/30 p-3 text-muted-foreground shadow-sm active:cursor-grabbing"
+                  >
+                    <div className="text-[12.5px] font-semibold leading-snug line-clamp-2">
+                      {licitacao.objeto}
+                    </div>
+                    <div className="text-[11px] line-clamp-1">
+                      {licitacao.orgaoNome}
+                    </div>
+                  </div>
+                ))}
+                {colunaIgnorada.length === 0 && (
+                  <div className="text-[12px] text-muted-foreground">
+                    Nenhuma oportunidade ignorada.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       <OportunidadeSheet
         item={selected}

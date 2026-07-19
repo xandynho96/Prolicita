@@ -5,6 +5,8 @@ export const CATEGORIA_META: Record<
   juridico: { label: "Jurídico", color: "#445FCE", initials: "JU" },
   fiscal: { label: "Fiscal", color: "#0C7A88", initials: "FI" },
   tecnico: { label: "Técnico", color: "#B45A1E", initials: "TE" },
+  economico: { label: "Econômico-financeiro", color: "#3D8B5F", initials: "EC" },
+  declaracoes: { label: "Declarações", color: "#6B4CE0", initials: "DE" },
   propostas: { label: "Propostas", color: "#8A7415", initials: "PR" },
   editais: { label: "Editais", color: "#55606E", initials: "ED" },
 };
