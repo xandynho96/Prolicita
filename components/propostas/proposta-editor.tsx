@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,7 +49,9 @@ export function PropostaEditor({
     proposta.produtosSelecionadosIds
   );
   const [salvando, setSalvando] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
   const [status, setStatus] = useState(proposta.status);
+  const router = useRouter();
 
   const toggleProduto = (id: string) => {
     setProdutosSelecionados((atual) =>
@@ -79,6 +82,27 @@ export function PropostaEditor({
       return;
     }
     toast.success("Proposta salva");
+  };
+
+  const excluir = async () => {
+    if (
+      !window.confirm(
+        "Excluir esta proposta? Essa ação não pode ser desfeita."
+      )
+    ) {
+      return;
+    }
+    setExcluindo(true);
+    const res = await fetch(`/api/propostas/${proposta.id}`, {
+      method: "DELETE",
+    });
+    setExcluindo(false);
+    if (!res.ok) {
+      toast.error("Falha ao excluir proposta");
+      return;
+    }
+    toast.success("Proposta excluída");
+    router.push("/propostas");
   };
 
   return (
@@ -209,6 +233,15 @@ export function PropostaEditor({
             Baixar PDF
           </Button>
         </a>
+        <Button
+          type="button"
+          variant="ghost"
+          className="ml-auto text-destructive hover:text-destructive"
+          onClick={excluir}
+          disabled={excluindo}
+        >
+          {excluindo ? "Excluindo..." : "Excluir proposta"}
+        </Button>
       </div>
     </div>
   );
