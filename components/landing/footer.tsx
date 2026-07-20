@@ -53,7 +53,7 @@ export function LandingFooter() {
             </div>
             <div className="flex items-center gap-2 text-[13px] text-white/60">
               <Mail className="h-4 w-4" />
-              <span>contato@prolicita.com.br</span>
+              <span>prolicita.ia@gmail.com</span>
             </div>
           </div>
 

@@ -116,10 +116,10 @@ export default function PoliticaDePrivacidadePage() {
         <p className="mt-2">
           Para exercer esses direitos, envie um e-mail para{" "}
           <a
-            href="mailto:contato@prolicita.com.br"
+            href="mailto:prolicita.ia@gmail.com"
             className="font-semibold text-primary hover:underline"
           >
-            contato@prolicita.com.br
+            prolicita.ia@gmail.com
           </a>
           .
         </p>
@@ -147,10 +147,10 @@ export default function PoliticaDePrivacidadePage() {
         <p className="mt-2">
           Dúvidas sobre esta Política podem ser enviadas para{" "}
           <a
-            href="mailto:contato@prolicita.com.br"
+            href="mailto:prolicita.ia@gmail.com"
             className="font-semibold text-primary hover:underline"
           >
-            contato@prolicita.com.br
+            prolicita.ia@gmail.com
           </a>
           .
         </p>

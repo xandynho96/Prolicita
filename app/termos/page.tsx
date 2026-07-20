@@ -135,10 +135,10 @@ export default function TermosDeUsoPage() {
         <p className="mt-2">
           Dúvidas sobre estes Termos podem ser enviadas para{" "}
           <a
-            href="mailto:contato@prolicita.com.br"
+            href="mailto:prolicita.ia@gmail.com"
             className="font-semibold text-primary hover:underline"
           >
-            contato@prolicita.com.br
+            prolicita.ia@gmail.com
           </a>
           .
         </p>
