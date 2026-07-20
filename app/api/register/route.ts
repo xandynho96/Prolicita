@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, email, password, telefone, cpf } = parsed.data;
   const normalizedEmail = email.toLowerCase();
 
   const [existing] = await db
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
   const [user] = await db
     .insert(users)
-    .values({ name, email: normalizedEmail, passwordHash })
+    .values({ name, email: normalizedEmail, passwordHash, telefone, cpf })
     .returning({ id: users.id, email: users.email });
 
   return NextResponse.json({ user });

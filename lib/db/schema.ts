@@ -22,6 +22,7 @@ export const matchStatusEnum = pgEnum("match_status", [
 export const notificacaoCanalEnum = pgEnum("notificacao_canal", [
   "painel",
   "whatsapp",
+  "email",
 ]);
 
 export const notificacaoStatusEnum = pgEnum("notificacao_status", [
@@ -77,6 +78,8 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   // Nulo para contas criadas via login social (ex.: Google), que não têm senha.
   passwordHash: text("password_hash"),
+  telefone: text("telefone"),
+  cpf: text("cpf"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -117,6 +120,7 @@ export const empresas = pgTable("empresas", {
     .notNull()
     .default([]),
   whatsappAtivo: boolean("whatsapp_ativo").notNull().default(true),
+  emailAtivo: boolean("email_ativo").notNull().default(true),
   representanteLegalNome: text("representante_legal_nome"),
   representanteLegalCpf: text("representante_legal_cpf"),
   representanteLegalCargo: text("representante_legal_cargo"),

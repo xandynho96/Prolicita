@@ -66,6 +66,7 @@ interface EmpresaForm {
   modalidades: number[];
   contatosWhatsapp: Contato[];
   whatsappAtivo: boolean;
+  emailAtivo: boolean;
   representanteLegalNome: string;
   representanteLegalCpf: string;
   representanteLegalCargo: string;
@@ -96,6 +97,7 @@ const vazio: EmpresaForm = {
   modalidades: [],
   contatosWhatsapp: [],
   whatsappAtivo: true,
+  emailAtivo: true,
   representanteLegalNome: "",
   representanteLegalCpf: "",
   representanteLegalCargo: "",
@@ -147,6 +149,7 @@ export default function PerfilPage() {
               (c: Contato) => ({ ...c, numero: maskWhatsapp(c.numero) })
             ),
             whatsappAtivo: e.whatsappAtivo ?? true,
+            emailAtivo: e.emailAtivo ?? true,
             representanteLegalNome: e.representanteLegalNome ?? "",
             representanteLegalCpf: maskCpf(e.representanteLegalCpf ?? ""),
             representanteLegalCargo: e.representanteLegalCargo ?? "",
@@ -294,6 +297,7 @@ export default function PerfilPage() {
       modalidades: form.modalidades,
       contatosWhatsapp: contatosValidos,
       whatsappAtivo: form.whatsappAtivo,
+      emailAtivo: form.emailAtivo,
       representanteLegalNome: form.representanteLegalNome || undefined,
       representanteLegalCpf: form.representanteLegalCpf || undefined,
       representanteLegalCargo: form.representanteLegalCargo || undefined,
@@ -707,6 +711,25 @@ export default function PerfilPage() {
                   painel continua mostrando as licitações compatíveis
                   normalmente. Útil se o número estiver sob restrição do
                   WhatsApp.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2 rounded-lg border border-border bg-accent/30 p-3">
+              <Checkbox
+                id="emailAtivo"
+                checked={form.emailAtivo}
+                onCheckedChange={(v) =>
+                  setForm((f) => ({ ...f, emailAtivo: v === true }))
+                }
+              />
+              <div>
+                <Label htmlFor="emailAtivo" className="font-normal">
+                  Enviar alertas por email
+                </Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Envia um resumo por email (para o email da sua conta)
+                  sempre que uma nova licitação compatível for encontrada.
                 </p>
               </div>
             </div>

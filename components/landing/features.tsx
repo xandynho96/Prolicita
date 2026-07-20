@@ -49,7 +49,7 @@ const RECURSOS = [
   },
   {
     icon: Bell,
-    titulo: "Alertas por painel e WhatsApp",
+    titulo: "Alertas por painel, WhatsApp e email",
     descricao:
       "Seja avisado assim que uma licitação compatível for encontrada, sem precisar ficar checando o painel.",
   },

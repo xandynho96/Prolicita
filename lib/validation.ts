@@ -13,6 +13,16 @@ export const cadastroSchema = z.object({
     .string()
     .min(8, "A senha deve ter pelo menos 8 caracteres")
     .max(72, "A senha deve ter no máximo 72 caracteres"),
+  telefone: z
+    .string()
+    .min(10, "Telefone inválido")
+    .max(20, "Telefone inválido")
+    .transform((v) => v.replace(/\D/g, "")),
+  cpf: z
+    .string()
+    .min(11, "CPF inválido")
+    .max(14, "CPF inválido")
+    .transform((v) => v.replace(/\D/g, "")),
 });
 
 export const contatoWhatsappSchema = z.object({
@@ -71,6 +81,7 @@ export const empresaSchema = z.object({
   modalidades: z.array(z.number()).max(LIMITES.ARRAY_PEQUENO),
   contatosWhatsapp: z.array(contatoWhatsappSchema).max(20),
   whatsappAtivo: z.boolean().default(true),
+  emailAtivo: z.boolean().default(true),
   representanteLegalNome: textoOpcional(LIMITES.TEXTO_CURTO),
   representanteLegalCpf: z
     .string()

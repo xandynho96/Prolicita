@@ -5,10 +5,12 @@ import {
   empresas,
   licitacoes,
   produtosServicos,
+  users,
 } from "@/lib/db/schema";
 import { passaFiltroPreliminar } from "./keyword-filter";
 import { avaliarMatchIA } from "./ai-match";
 import {
+  enviarResumoEmail,
   enviarResumoWhatsapp,
   registrarNotificacaoPainel,
 } from "@/lib/notifications/notify";
@@ -35,7 +37,10 @@ async function buscarCandidatosSemMatch(empresaId: string) {
   return linhas.map((l) => l.licitacao);
 }
 
-async function processarEmpresa(empresa: typeof empresas.$inferSelect) {
+async function processarEmpresa(
+  empresa: typeof empresas.$inferSelect,
+  userEmail: string | null
+) {
   const [candidatos, produtos] = await Promise.all([
     buscarCandidatosSemMatch(empresa.id),
     db
@@ -105,6 +110,7 @@ async function processarEmpresa(empresa: typeof empresas.$inferSelect) {
   }
 
   await enviarResumoWhatsapp(empresa, matchesEncontrados);
+  await enviarResumoEmail(empresa, userEmail, matchesEncontrados);
 
   return {
     avaliadas: preFiltrados.length,
@@ -117,18 +123,20 @@ async function processarEmpresa(empresa: typeof empresas.$inferSelect) {
  * específica, ou para todas as empresas cadastradas.
  */
 export async function executarMatching(options?: { empresaId?: string }) {
+  const query = db
+    .select({ empresa: empresas, userEmail: users.email })
+    .from(empresas)
+    .innerJoin(users, eq(users.id, empresas.userId));
+
   const listaEmpresas = options?.empresaId
-    ? await db
-        .select()
-        .from(empresas)
-        .where(eq(empresas.id, options.empresaId))
-    : await db.select().from(empresas);
+    ? await query.where(eq(empresas.id, options.empresaId))
+    : await query;
 
   let totalAvaliadas = 0;
   let totalMatches = 0;
 
-  for (const empresa of listaEmpresas) {
-    const resultado = await processarEmpresa(empresa);
+  for (const { empresa, userEmail } of listaEmpresas) {
+    const resultado = await processarEmpresa(empresa, userEmail);
     totalAvaliadas += resultado.avaliadas;
     totalMatches += resultado.matches;
   }

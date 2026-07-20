@@ -15,12 +15,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { GoogleButton } from "@/components/auth/google-button";
+import { maskCpf, maskTelefone } from "@/lib/masks";
 
 export default function CadastroPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [cpf, setCpf] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +35,7 @@ export default function CadastroPage() {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, telefone, cpf }),
     });
 
     const data = await res.json();
@@ -93,6 +96,26 @@ export default function CadastroPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="telefone">Telefone/WhatsApp</Label>
+            <Input
+              id="telefone"
+              required
+              placeholder="(11) 99999-9999"
+              value={telefone}
+              onChange={(e) => setTelefone(maskTelefone(e.target.value))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cpf">CPF</Label>
+            <Input
+              id="cpf"
+              required
+              placeholder="000.000.000-00"
+              value={cpf}
+              onChange={(e) => setCpf(maskCpf(e.target.value))}
             />
           </div>
           <div className="space-y-2">

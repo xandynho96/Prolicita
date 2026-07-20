@@ -12,7 +12,7 @@ const PLANOS = [
     recursos: [
       "Busca automática de licitações no PNCP",
       "Matching por IA com o perfil da empresa",
-      "Alertas por painel e WhatsApp",
+      "Alertas por painel, WhatsApp e email",
       "1 empresa cadastrada",
     ],
   },

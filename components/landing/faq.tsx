@@ -28,7 +28,7 @@ const PERGUNTAS = [
   {
     pergunta: "Preciso ficar checando o painel toda hora?",
     resposta:
-      "Não. Você recebe alertas automáticos pelo painel e por WhatsApp assim que uma licitação compatível é encontrada.",
+      "Não. Você recebe alertas automáticos pelo painel, por WhatsApp e por email assim que uma licitação compatível é encontrada.",
   },
   {
     pergunta: "A proposta gerada por IA pode ser enviada direto para o órgão?",

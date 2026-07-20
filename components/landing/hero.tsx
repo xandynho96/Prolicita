@@ -8,7 +8,7 @@ const DESTAQUES = [
   "Radar automático no PNCP com IA especializada",
   "Encontre licitações e acompanhe cada oportunidade",
   "Checklist de habilitação e propostas geradas por IA",
-  "Alertas em tempo real pelo painel e por WhatsApp",
+  "Alertas em tempo real pelo painel, WhatsApp e email",
 ];
 
 export function Hero({ totalLicitacoes }: { totalLicitacoes: number }) {
