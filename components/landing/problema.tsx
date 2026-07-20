@@ -27,7 +27,7 @@ export function Problema() {
     <section className="bg-[#F9FAFB] py-16">
       <div className="mx-auto max-w-6xl px-6">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <span className="text-[12.5px] font-bold uppercase tracking-wide text-[#0F9D6F]">
+          <span className="text-[12.5px] font-bold uppercase tracking-wide text-[#0EA5C4]">
             O problema
           </span>
           <h2 className="mt-2 text-[27px] font-extrabold tracking-tight text-[#101828]">

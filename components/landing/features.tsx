@@ -79,7 +79,7 @@ export function Features() {
           {RECURSOS.map((recurso, i) => (
             <ScrollReveal key={recurso.titulo} delayMs={(i % 4) * 80}>
               <div className="flex flex-col gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#EAF7F1] text-[#0F9D6F]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#E7F6F9] text-[#0EA5C4]">
                   <recurso.icon className="h-5 w-5" />
                 </div>
                 <div className="text-[14px] font-bold">{recurso.titulo}</div>

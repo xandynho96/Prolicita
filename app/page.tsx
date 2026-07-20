@@ -65,7 +65,7 @@ export default async function Home() {
               <Button variant="ghost">Entrar</Button>
             </Link>
             <Link href="/cadastro">
-              <Button className="bg-[#0F9D6F] text-white hover:bg-[#0C7F59]">
+              <Button className="bg-[#0EA5C4] text-white hover:bg-[#0B87A3]">
                 Criar conta
               </Button>
             </Link>

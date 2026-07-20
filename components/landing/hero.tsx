@@ -16,7 +16,7 @@ export function Hero({ totalLicitacoes }: { totalLicitacoes: number }) {
     <section className="bg-white">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-20">
         <div className="flex flex-col gap-6">
-          <span className="w-fit rounded-full border border-[#CDEBDF] bg-[#EAF7F1] px-3.5 py-1.5 text-[12.5px] font-bold text-[#0F9D6F]">
+          <span className="w-fit rounded-full border border-[#BFE7EF] bg-[#E7F6F9] px-3.5 py-1.5 text-[12.5px] font-bold text-[#0EA5C4]">
             Acesso antecipado aberto — grátis por enquanto
           </span>
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-[#101828] sm:text-[46px]">
@@ -32,7 +32,7 @@ export function Hero({ totalLicitacoes }: { totalLicitacoes: number }) {
           <ul className="flex flex-col gap-2.5">
             {DESTAQUES.map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-[14.5px] font-medium text-[#344054]">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EAF7F1] text-[#0F9D6F]">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#E7F6F9] text-[#0EA5C4]">
                   <Check className="h-3.5 w-3.5" />
                 </span>
                 {item}
@@ -44,7 +44,7 @@ export function Hero({ totalLicitacoes }: { totalLicitacoes: number }) {
             <Link href="/cadastro">
               <Button
                 size="lg"
-                className="bg-[#0F9D6F] text-white hover:bg-[#0C7F59]"
+                className="bg-[#0EA5C4] text-white hover:bg-[#0B87A3]"
               >
                 Cadastre-se gratuitamente
               </Button>
@@ -60,7 +60,7 @@ export function Hero({ totalLicitacoes }: { totalLicitacoes: number }) {
         <ScrollReveal className="relative">
           <div
             aria-hidden
-            className="absolute -inset-6 -z-10 rounded-[32px] bg-[#EAF7F1]"
+            className="absolute -inset-6 -z-10 rounded-[32px] bg-[#E7F6F9]"
           />
           <BrowserFrame
             src="/screenshots/dashboard.png"
@@ -74,7 +74,7 @@ export function Hero({ totalLicitacoes }: { totalLicitacoes: number }) {
             <div className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
               Licitações compatíveis
             </div>
-            <div className="text-[22px] font-extrabold text-[#0F9D6F]">
+            <div className="text-[22px] font-extrabold text-[#0EA5C4]">
               +{totalLicitacoes.toLocaleString("pt-BR")}
             </div>
           </div>
@@ -83,7 +83,7 @@ export function Hero({ totalLicitacoes }: { totalLicitacoes: number }) {
             <div className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
               Score de match
             </div>
-            <div className="text-[22px] font-extrabold text-[#0F9D6F]">90%</div>
+            <div className="text-[22px] font-extrabold text-[#0EA5C4]">90%</div>
           </div>
         </ScrollReveal>
       </div>

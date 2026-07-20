@@ -31,16 +31,16 @@ const COLUNAS = [
 export function LandingFooter() {
   const ano = new Date().getFullYear();
   return (
-    <footer className="bg-[#0F1420] text-white">
+    <footer className="bg-[#0B1F45] text-white">
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="flex flex-col gap-4">
             <Image
-              src="/logo-prolicita.png"
+              src="/logo-prolicita-footer.png"
               alt="ProLicita"
-              width={250}
-              height={81}
-              className="h-11 w-auto brightness-0 invert"
+              width={547}
+              height={267}
+              className="h-14 w-[115px] object-contain brightness-0 invert"
             />
             <p className="max-w-[280px] text-[13px] leading-relaxed text-white/60">
               O radar de licitações públicas que monitora o PNCP, avalia

@@ -23,7 +23,7 @@ export function StatsBar({
   ];
 
   return (
-    <section className="bg-[#0F9D6F] py-10">
+    <section className="bg-[#0B1F45] py-10">
       <ScrollReveal className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 sm:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label} className="text-center">
