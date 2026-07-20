@@ -36,7 +36,7 @@ export function Pricing() {
     <section id="planos" className="bg-white py-16">
       <div className="mx-auto max-w-6xl px-6">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full border border-[#DCE3F5] bg-[#F3F6FE] px-3.5 py-1.5 text-[12px] font-bold text-primary">
+          <span className="inline-block rounded-full border border-[#CDEBDF] bg-[#EAF7F1] px-3.5 py-1.5 text-[12px] font-bold text-[#0F9D6F]">
             Acesso antecipado · sem cobrança agora
           </span>
           <h2 className="mt-4 text-[27px] font-extrabold tracking-tight">
@@ -56,12 +56,12 @@ export function Pricing() {
               <div
                 className={`relative flex h-full flex-col gap-6 rounded-[14px] border bg-white p-7 ${
                   plano.destaque
-                    ? "border-transparent bg-gradient-to-b from-white to-white shadow-[0_16px_40px_rgba(47,95,222,0.16)] ring-2 ring-primary/60"
+                    ? "border-transparent shadow-[0_16px_40px_rgba(15,157,111,0.16)] ring-2 ring-[#0F9D6F]/60"
                     : "border-border shadow-sm"
                 }`}
               >
                 {plano.destaque && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#2F5FDE] to-[#7C5CFC] px-3 py-1 text-[11px] font-bold text-white">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#0F9D6F] px-3 py-1 text-[11px] font-bold text-white">
                     Mais popular
                   </span>
                 )}
@@ -91,7 +91,7 @@ export function Pricing() {
                 <ul className="flex flex-col gap-2.5">
                   {plano.recursos.map((recurso) => (
                     <li key={recurso} className="flex items-start gap-2.5 text-[13.5px]">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#0F9D6F]" />
                       <span>{recurso}</span>
                     </li>
                   ))}
@@ -99,7 +99,11 @@ export function Pricing() {
 
                 <Link href="/cadastro" className="mt-auto">
                   <Button
-                    className="w-full"
+                    className={`w-full ${
+                      plano.destaque
+                        ? "bg-[#0F9D6F] text-white hover:bg-[#0C7F59]"
+                        : ""
+                    }`}
                     variant={plano.destaque ? "default" : "outline"}
                     size="lg"
                   >

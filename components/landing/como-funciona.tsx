@@ -45,7 +45,7 @@ export function ComoFunciona() {
         {PASSOS.map((passo, i) => (
           <ScrollReveal key={passo.titulo} delayMs={i * 100}>
             <div className="flex h-full flex-col gap-3 rounded-[14px] border border-border bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#2F5FDE] to-[#7C5CFC] text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#EAF7F1] text-[#0F9D6F]">
                 <passo.icon className="h-5 w-5" />
               </div>
               <div className="text-[14.5px] font-bold">{passo.titulo}</div>

@@ -11,7 +11,7 @@ const GARANTIAS = [
 
 export function Cta() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#2350C4] via-[#2F5FDE] to-[#7C5CFC] py-20">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#0C7F59] via-[#0F9D6F] to-[#14B8A6] py-20">
       <div
         aria-hidden
         className="animate-float-blob pointer-events-none absolute -top-20 left-[-8%] h-[320px] w-[320px] rounded-full bg-white/10 blur-3xl"

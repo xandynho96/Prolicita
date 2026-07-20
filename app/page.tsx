@@ -1,9 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { sql } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { licitacoes, capagMunicipios } from "@/lib/db/schema";
+import { MODALIDADES_CONTRATACAO } from "@/lib/pncp/types";
 import { Hero } from "@/components/landing/hero";
+import { StatsBar } from "@/components/landing/stats-bar";
+import { Problema } from "@/components/landing/problema";
 import { ComoFunciona } from "@/components/landing/como-funciona";
 import { Features } from "@/components/landing/features";
 import { ScreenshotShowcase } from "@/components/landing/screenshot-showcase";
@@ -24,6 +30,12 @@ export default async function Home() {
   if (session?.user) {
     redirect("/dashboard");
   }
+
+  const [[{ count: totalLicitacoes }], [{ count: totalMunicipiosCapag }]] =
+    await Promise.all([
+      db.select({ count: sql<number>`count(*)::int` }).from(licitacoes),
+      db.select({ count: sql<number>`count(*)::int` }).from(capagMunicipios),
+    ]);
 
   return (
     <div className="flex min-h-svh flex-col bg-background">
@@ -53,14 +65,22 @@ export default async function Home() {
               <Button variant="ghost">Entrar</Button>
             </Link>
             <Link href="/cadastro">
-              <Button>Criar conta</Button>
+              <Button className="bg-[#0F9D6F] text-white hover:bg-[#0C7F59]">
+                Criar conta
+              </Button>
             </Link>
           </div>
         </div>
       </header>
 
       <main className="flex-1">
-        <Hero />
+        <Hero totalLicitacoes={totalLicitacoes} />
+        <StatsBar
+          totalLicitacoes={totalLicitacoes}
+          totalMunicipiosCapag={totalMunicipiosCapag}
+          totalModalidades={Object.keys(MODALIDADES_CONTRATACAO).length}
+        />
+        <Problema />
         <ComoFunciona />
         <Features />
         <ScreenshotShowcase />
